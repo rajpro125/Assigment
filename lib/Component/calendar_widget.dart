@@ -7,7 +7,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class CalendarWidget extends StatefulWidget {
   DateTime? selectedDate;
-  final Function(DateTime)? callBack;
+  final Function(DateTime?)? callBack;
   final bool? isLastDate;
 
   CalendarWidget(
@@ -229,12 +229,23 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   return isSameDay(widget.selectedDate, date);
                 },
                 onDaySelected: (DateTime selectDay, DateTime focusDay) {
-                  setState(() {
+                  setState((){
                     widget.selectedDate = selectDay;
                     focusedDay = focusDay;
                     updateHeaderText();
                   });
+                  // log("-=0=-0=-0=0=-onDaySelected0  ${selectDay}");
+
                 },
+
+                 onPageChanged: (fs) {
+                   focusedDay = fs  ;
+                   // focusedDay = focusedDay.add(const Duration(days: 30));
+                   headerText = DateFormat('MMMM y').format(fs);
+                   // headerText = DateFormat('MMMM y').format(focusedDay).toString();
+                   setState(() {});
+                 // log("-=0=-0=-0=0=-0  ${fs}");
+                 },
                 calendarStyle: CalendarStyle(
                   todayDecoration: BoxDecoration(
                     // color: Colors.blue,
@@ -302,7 +313,16 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 ),
                 onPressed: () {
                   // saveEmployee();
-                  widget.callBack!(widget.selectedDate!);
+                  if (widget.isLastDate==false) {
+                    widget.callBack!(widget.selectedDate!);
+
+                  }  else{
+                    // if(selectedIndex==0){
+                    //   widget.selectedDate=null;
+                    // }
+                    widget.callBack!(widget.selectedDate);
+
+                  }
                   Navigator.of(context).pop();
                 },
                 child: 'Save'.text.medium.size(14).make(),
@@ -315,7 +335,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   DateTime getNextMonday() {
-    final today = DateTime.now();
+    // final today = DateTime.now();
+    final today = widget.selectedDate!;
     final daysUntilMonday = 1 - today.weekday;
     if (daysUntilMonday <= 0) {
       return today.add(Duration(days: (7 - today.weekday) + 1));
@@ -325,7 +346,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   DateTime getNextTuesday() {
-    final today = DateTime.now();
+    // final today = DateTime.now();
+    final today = widget.selectedDate!;
     final daysUntilTuesday = 2 - today.weekday;
     if (daysUntilTuesday <= 0) {
       return today.add(Duration(days: (7 - today.weekday) + 2));
@@ -335,6 +357,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   DateTime getAfterOneWeek() {
-    return DateTime.now().add(const Duration(days: 7));
+    final today = widget.selectedDate!;
+    return today.add(const Duration(days: 7));
   }
 }

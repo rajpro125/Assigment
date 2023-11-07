@@ -36,6 +36,7 @@ class _EmployeeEditDetailsState extends State<EmployeeEditDetails> {
       nameController.text = widget.employee!.name!;
       selectedRole = widget.employee!.role;
       selectedDate = DateTime.parse(widget.employee!.dateOfEmployment!);
+      lastDate =widget.employee!.endDateOfEmployment==""?null: DateTime.parse(widget.employee!.endDateOfEmployment!);
       // Also, you can set lastDate if needed.
     }
   }
@@ -47,7 +48,7 @@ class _EmployeeEditDetailsState extends State<EmployeeEditDetails> {
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Text('Edit Employee Detail'),
+        title: const Text('Edit Employee Details'),
         actions: [
           GestureDetector(
             onTap: (){
@@ -154,22 +155,24 @@ class _EmployeeEditDetailsState extends State<EmployeeEditDetails> {
                           context,
                           isLastDate: true,
                           callBack: (v) {
-                            setState(() {
-                              if (selectedDate == null ||
-                                  v.isAfter(selectedDate!)) {
-                                lastDate = v;
-                              } else {
-                                var snackBar = const SnackBar(content: Text('Selected date cannot be the same.'));
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                              }
-                            });
+                           if(v!=null){
+                             setState(() {
+                               if (selectedDate == null ||
+                                   v.isAfter(selectedDate!)) {
+                                 lastDate = v;
+                               } else {
+                                 var snackBar = const SnackBar(content: Text('Selected date cannot be the same.'));
+                                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                               }
+                             });
+                           }
                           },
                         );
                       },
                       child: Text(
                         lastDate == null
                             ? "No date"
-                            : DateFormat('dd MMM y').format(lastDate!),
+                            : lastDate!.day.toString()==DateFormat("d").format(DateTime.now())?"Today": DateFormat('dd MMM y').format(lastDate!),
                         style: lastDate == null
                             ? const TextStyle(color: Colors.grey)
                             : const TextStyle(color: Colors.black),
@@ -271,7 +274,7 @@ class _EmployeeEditDetailsState extends State<EmployeeEditDetails> {
 
   /// Show Dialog DatePicker
   _showCustomDatePickerDialog(BuildContext context,
-      {Function(DateTime)? callBack, bool isLastDate = false}) {
+      {Function(DateTime?)? callBack, bool isLastDate = false}) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -303,7 +306,10 @@ class _EmployeeEditDetailsState extends State<EmployeeEditDetails> {
     // Check if employee.id is not null before proceeding
     if (employee.id != null) {
       // Delete the employee from the list
+
+      Navigator.pop(context);
       employeeBloc.deleteEmployee(index);
+
       // employeeBloc.deleteEmployee(employee.id!);
     }
 
@@ -343,6 +349,7 @@ class _EmployeeEditDetailsState extends State<EmployeeEditDetails> {
         name: nameController.text,
         role: selectedRole ?? '',
         dateOfEmployment: selectedDate != null ? selectedDate.toString() : '',
+        endDateOfEmployment: lastDate==null?"":lastDate.toString()
 
       );
 

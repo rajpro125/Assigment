@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:assignment_raj/Component/calendar_widget.dart';
 import 'package:assignment_raj/Controller/employee.dart';
 import 'package:assignment_raj/model/employee_model.dart';
@@ -36,7 +37,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Text('Employee Detail'),
+        title: const Text('Add Employee Details'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,9 +48,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
               hintText: 'Employee name',
+              hintStyle:const TextStyle(color: Colors.grey),
               prefixIcon: const Icon(Icons.person_outline, color: Colors.blue),
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
+              const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4.0),
               ),
@@ -73,7 +75,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   borderRadius: BorderRadius.circular(4.0),
                 ),
               ),
-              child: Text(selectedRole ?? 'Select role'),
+              child: Text(selectedRole ?? 'Select role',style: selectedRole!=null?const TextStyle(): const TextStyle(color: Colors.grey) ),
             ),
           ).px12(),
           20.heightBox,
@@ -105,7 +107,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                           Text(
                             selectedDate == null
                                 ? "Today"
-                                :  selectedDate!.day.toString()==DateFormat("d").format(DateTime.now())?"Today":DateFormat('dd MMM y').format(selectedDate!),
+                                : selectedDate!.day.toString() ==
+                                DateFormat("d").format(DateTime.now())
+                                ? "Today"
+                                : DateFormat('dd MMM y').format(selectedDate!),
                             style: const TextStyle(color: Colors.black),
                           ),
                         ],
@@ -135,22 +140,28 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                           context,
                           isLastDate: true,
                           callBack: (v) {
-                            setState(() {
-                              if (selectedDate == null ||
-                                  v.isAfter(selectedDate!)) {
-                                lastDate = v;
-                              } else {
-                                var snackBar = const SnackBar(content: Text('Selected date cannot be the same.'));
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                              }
-                            });
+                            if (v != null) {
+                              setState(() {
+                                if (selectedDate == null ||
+                                    v.isAfter(selectedDate!)) {
+                                  lastDate = v;
+                                } else {
+                                  var snackBar = const SnackBar(content: Text(
+                                      'Selected date cannot be the same.'));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      snackBar);
+                                }
+                              });
+                            }
                           },
                         );
                       },
                       child: Text(
                         lastDate == null
                             ? "No date"
-                            : lastDate!.day.toString()==DateFormat("d").format(DateTime.now())?"Today": DateFormat('dd MMM y').format(lastDate!),
+                            : lastDate!.day.toString() == DateFormat("d")
+                            .format(DateTime.now()) ? "Today" : DateFormat(
+                            'dd MMM y').format(lastDate!),
                         style: lastDate == null
                             ? const TextStyle(color: Colors.grey)
                             : const TextStyle(color: Colors.black),
@@ -182,7 +193,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: 'Cancel'.text.medium.size(14).sky500.make(),
+                      child: 'Cancel'.text.medium
+                          .size(14)
+                          .sky500
+                          .make(),
                     ),
                     15.widthBox,
                     ElevatedButton(
@@ -252,7 +266,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
 
   /// Show Dialog DatePicker
   _showCustomDatePickerDialog(BuildContext context,
-      {Function(DateTime)? callBack, bool isLastDate = false}) {
+      {Function(DateTime?)? callBack, bool isLastDate = false}) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -260,11 +274,14 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
           insetPadding: const EdgeInsets.only(left: 20, right: 20),
           shape: RoundedRectangleBorder(
             borderRadius:
-                BorderRadius.circular(10.0), // Adjust the radius as needed
+            BorderRadius.circular(10.0), // Adjust the radius as needed
           ),
           content: SizedBox(
             // height: 475,
-            width: MediaQuery.of(context).size.width * 0.9,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.9,
             child: CalendarWidget(
                 selectedDate: selectedDate ?? DateTime.now(),
                 callBack: callBack,
@@ -276,20 +293,29 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   }
 
   /// Save Employee Data
-  Future<void>  saveEmployee() async {
-    // log("nameController   ${nameController.text}");
-    // log("selectedRole   $selectedRole");
-    // log("selectedDate   ${selectedDate.toString()}");
+  Future<void> saveEmployee() async {
+    log("nameController   ${nameController.text}");
+    log("selectedRole   $selectedRole");
+    log("selectedDate   ${selectedDate.toString()}");
+    log("selectedDate   ${lastDate == null ? "" : lastDate.toString()}");
 
     if (mounted) {
       final name = nameController.text;
       final role = selectedRole ?? ''; // Ensure a default value for role
-      final dateOfEmployment =
-      selectedDate != null ? selectedDate.toString() : DateTime.now().toString();
+      final dateOfEmployment = selectedDate != null
+          ? selectedDate.toString()
+          : DateTime.now().toString();
+      final endDateOfEmployment = lastDate == null ? "" : lastDate.toString();
 
       if (name.isNotEmpty) {
         final employee = Employee(
-            name: name, role: role, dateOfEmployment: dateOfEmployment,id: DateTime.now().microsecondsSinceEpoch);
+            name: name,
+            role: role,
+            dateOfEmployment: dateOfEmployment,
+            id: DateTime
+                .now()
+                .microsecondsSinceEpoch,
+            endDateOfEmployment: endDateOfEmployment);
 
         try {
           final employeeBloc = context.read<EmployeeBloc>();

@@ -21,13 +21,14 @@ class EmployeeAdapter extends TypeAdapter<Employee> {
       name: fields[1] as String?,
       role: fields[2] as String?,
       dateOfEmployment: fields[3] as String?,
+      endDateOfEmployment: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Employee obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class EmployeeAdapter extends TypeAdapter<Employee> {
       ..writeByte(2)
       ..write(obj.role)
       ..writeByte(3)
-      ..write(obj.dateOfEmployment);
+      ..write(obj.dateOfEmployment)
+      ..writeByte(4)
+      ..write(obj.endDateOfEmployment);
   }
 
   @override
@@ -58,6 +61,7 @@ Employee _$EmployeeFromJson(Map<String, dynamic> json) => Employee(
       name: json['name'] as String?,
       role: json['role'] as String?,
       dateOfEmployment: json['dateOfEmployment'] as String?,
+      endDateOfEmployment: json['endDateOfEmployment'] as String?,
     );
 
 Map<String, dynamic> _$EmployeeToJson(Employee instance) => <String, dynamic>{
@@ -65,4 +69,5 @@ Map<String, dynamic> _$EmployeeToJson(Employee instance) => <String, dynamic>{
       'name': instance.name,
       'role': instance.role,
       'dateOfEmployment': instance.dateOfEmployment,
+      'endDateOfEmployment': instance.endDateOfEmployment,
     };

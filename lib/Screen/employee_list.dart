@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+
 import 'package:assignment_raj/Controller/employee.dart';
 import 'package:assignment_raj/Screen/add_employee_details.dart';
 import 'package:assignment_raj/Screen/edit_employee_details.dart';
@@ -32,71 +34,89 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   width: 261.79,
                   height: 244.38,
                 ).centered()
-              : SingleChildScrollView(
-                child: Column(
-                    children: [
-                      Container(
-                        height: 50,
-                        color: Colors.grey.withOpacity(0.2),
-                        padding: const EdgeInsets.only(left: 24),
-                        alignment: Alignment.centerLeft,
-                        child: const Text(
-                          "Current employees",
-                          style: TextStyle(
-                              color: Colors.blueAccent,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
+              : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 50,
+                              color: Colors.grey.withOpacity(0.2),
+                              padding: const EdgeInsets.only(left: 24),
+                              alignment: Alignment.centerLeft,
+                              child: const Text(
+                                "Current employees",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                            ListView.builder(
+                              itemCount: employeeList.length,
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final employee = employeeList[index];
+                                return DateTime.parse(employee.dateOfEmployment!)
+                                            .day
+                                            .toString() !=
+                                        DateFormat("d").format(DateTime.now())
+                                    ? const SizedBox()
+                                    : listData(employee, index, context);
+                              },
+                            ),
+                            Container(
+                              height: 50,
+                              color: Colors.grey.withOpacity(0.2),
+                              padding: const EdgeInsets.only(left: 24),
+                              alignment: Alignment.centerLeft,
+                              child: const Text(
+                                "Previous employees",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                            ListView.builder(
+                              itemCount: employeeList.length,
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final employee = employeeList[index];
+                                return DateTime.parse(employee.dateOfEmployment!)
+                                            .day
+                                            .toString() ==
+                                        DateFormat("d").format(DateTime.now())
+                                    ? const SizedBox()
+                                    : listData(employee, index, context,
+                                        isPreviousEmployee: true);
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      ListView.builder(
-
-                          itemCount: employeeList.length,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                            final employee = employeeList[index];
-                            return DateTime.parse(employee.dateOfEmployment!)
-                                        .day
-                                        .toString() !=
-                                    DateFormat("d").format(DateTime.now())
-                                ? const SizedBox()
-                                : listData(employee, index, context);
-                          },
-                        ),
-
-                      Container(
-                        height: 50,
-                        color: Colors.grey.withOpacity(0.2),
-                        padding: const EdgeInsets.only(left: 24),
-                        alignment: Alignment.centerLeft,
-                        child: const Text(
-                          "Previous employees",
-                          style: TextStyle(
-                              color: Colors.blueAccent,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      ListView.builder(
-                          itemCount: employeeList.length,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            final employee = employeeList[index];
-                            return DateTime.parse(employee.dateOfEmployment!)
-                                .day
-                                .toString() ==
-                                DateFormat("d").format(DateTime.now())
-                                ? const SizedBox()
-                                : listData(employee, index, context);
-                          },
-                        ),
-
-                    ],
                   ),
+                   Container(
+                     width: double.infinity,
+                          color: Colors.grey.withOpacity(0.2),
+                    padding: const EdgeInsets.only(bottom:24,top: 16, left: 16),
+                    child: const Text(
+                      "Swipe left to delete",
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xff949C9E),
+                          fontWeight: FontWeight.w500),
+                    ),
+                  )
+                ],
               );
         },
       ),
+
       floatingActionButton: Theme(
         data: ThemeData(
           floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -123,7 +143,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     );
   }
 
-   listData(Employee employee, int index, BuildContext context) {
+  listData(Employee employee, int index, BuildContext context,
+      {bool isPreviousEmployee = false}) {
     return Column(
       children: [
         Slidable(
@@ -138,7 +159,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                 },
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                icon: Icons.delete_outline_rounded,
+                icon: Icons.delete_outlined,
               ),
             ],
           ),
@@ -151,8 +172,18 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   children: [
                     employee.role!.text.size(14).normal.make(),
                     6.heightBox,
-                    Text(
-                        DateFormat('dd MMMM y').format(DateTime.parse(employee.dateOfEmployment!))),
+
+                    isPreviousEmployee == true
+                        ? Text("${DateFormat('dd MMMM y').format(
+                            DateTime.parse(employee.dateOfEmployment!),
+                          )} ${employee.endDateOfEmployment == "" ? "":"-"} ${employee.endDateOfEmployment == "" ? "" : DateFormat('dd MMMM y').format(
+                            DateTime.parse(employee.endDateOfEmployment!),
+                          )}")
+                        : Text(
+                            DateFormat('dd MMMM y').format(
+                              DateTime.parse(employee.dateOfEmployment!),
+                            ),
+                          ),
                     // employee.dateOfEmployment!.text
                     //     .size(12)
                     //     .normal
